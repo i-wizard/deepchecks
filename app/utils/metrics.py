@@ -1,9 +1,10 @@
 from typing import List, Dict
 
-from src.config.settings import settings
-from src.utils.cache_manager import CacheManager
-from src.utils.key_builder import KeyBuilder
-from src.utils.helper import has_outlier
+from app.config.redis_client import redis_client
+from app.config.settings import settings
+from app.repositories.memory import MemoryRepository
+from app.utils.key_builder import KeyBuilder
+from app.utils.helper import has_outlier
 
 # New metrics can be added by simply inheriting from this Metric base class
 
@@ -51,13 +52,11 @@ class LengthMetric(Metric):
         if metric_data.get('output_value') > maximum_value:
             alerts.append(create_alert(
                 "output", metric_data['output_value'], 'length_greater_than_threshold'))
-        cache = CacheManager()
-        saved_input_lengths = cache.retrieve_key(
+        cache = MemoryRepository(redis_client)
+        saved_input_lengths = cache.get(
             KeyBuilder.interaction_input_length()) or []
-        saved_output_lengths = cache.retrieve_key(
+        saved_output_lengths = cache.get(
             KeyBuilder.interaction_output_length()) or []
-        print("saved_input_lengths>>>", saved_input_lengths)
-        print("saved_output_lengths>>>", saved_output_lengths)
         if has_outlier(metric_data["input_value"], saved_input_lengths):
             alerts.append(create_alert(
                 "input", metric_data['input_value'], "length_is_outlier"))

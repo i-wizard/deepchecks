@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 env_path = Path().absolute()/'.env'
 load_dotenv(dotenv_path=env_path)
@@ -28,3 +29,7 @@ class Settings:
 
 
 settings: Settings = Settings()
+
+uri = settings.MONGO_URI or settings.DATABASE_URL
+client = MongoClient(uri)
+db = client["deepchecks_db"]

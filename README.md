@@ -35,3 +35,7 @@ Visit  http://localhost:7000
 #### Login credentials
 username: user
 password: password
+
+
+##NOTES
+use csv ID as main id
